@@ -46,21 +46,35 @@ def load_sub(video_id: str):
     return "".join(oneline)
 
 
+def preprocess(text: str) -> str:
+    processed_text = text
+    # 単語以外で必要ないもの
+    unnecessary_str: tuple[str] = ("[音楽]", "\n")
+    for s in unnecessary_str:
+        processed_text = processed_text.replace(s, "")
+
+    # 間投詞, 感嘆詞
+    interjection: tuple[str] = ("なんか", "あの", "えー", "えっと")
+    for target in interjection:
+        processed_text = processed_text.replace(target, "")
+    return processed_text
+
+
 def main():
     video_id: str = sys.argv[1]
 
-    video_info = dl_sub(video_id)
+    # video_info = dl_sub(video_id)
 
     oneline = load_sub(video_id)
-    raw_text = oneline.replace("[音楽]", "").replace("\n", "")
+    processed_text = preprocess(oneline)
 
     str_limit = 16500
-    split_raw_text = [raw_text[x : x + str_limit] for x in range(0, len(raw_text), str_limit)]
+    split_text = [processed_text[x : x + str_limit] for x in range(0, len(processed_text), str_limit)]
 
     nlp = spacy.load("ja_ginza")
 
     docs = []
-    for text in split_raw_text:
+    for text in split_text:
         docs.append(nlp(text))
 
     sents: list[str] = []
@@ -70,6 +84,8 @@ def main():
 
     with open(f"{video_id}_sent.txt", encoding="utf-8", mode="w") as f:
         f.writelines(sents)
+
+    print(f"文字数:{sum(list(map(lambda s: len(s), sents)))}")
 
 
 if __name__ == "__main__":
