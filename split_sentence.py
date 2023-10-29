@@ -29,7 +29,8 @@ def process_text(texts: Iterable[str]) -> list[str]:
     processed_text: list[str] = []
     oneline: list[str] = []
     for text in texts:
-        if text == "[音楽]":
+        # [音楽]か何もない空白の時はスキップ(空白はstringではなくNoneTypeになっている)
+        if text == "[音楽]" or type(text) is not str:
             continue
         oneline.append(text)
         if len(text) > 17:

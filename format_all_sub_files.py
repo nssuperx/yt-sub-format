@@ -7,7 +7,7 @@ from split_sentence import load_sub, process_text
 def main():
     dirname: str = sys.argv[1]
 
-    ttmlfiles = glob.glob(f"{dirname}/*.ja.ttml")
+    ttmlfiles = glob.glob(f"{dirname}/**/*.ja.ttml", recursive=True)
 
     for file in ttmlfiles:
         texts = load_sub(file)
